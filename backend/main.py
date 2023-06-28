@@ -1,8 +1,8 @@
 import base64
 
 from fastapi import FastAPI
-from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 # memo  uvicorn main:app --reload
 
 from models import stable_diffusion
@@ -22,8 +22,12 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-@app.get("/")
-async def root():
-    images = stable_diffusion.generate_image(num_of_images=5)
+class PromptItem(BaseModel):
+    prompt: str
+
+
+@app.post("/")
+async def root(item:PromptItem):
+    images = stable_diffusion.generate_image(prompt=item.prompt, num_of_images=6)
     # binaryデータをbase64に変換してレスポンス
     return {"images": images}

@@ -1,6 +1,8 @@
+import base64
 import io
 import os
 
+from fastapi.encoders import jsonable_encoder
 from diffusers import StableDiffusionPipeline
 from dotenv import load_dotenv
 import torch
@@ -18,11 +20,12 @@ def generate_image(prompt='best quality, background illustration, Uyuni salt lak
         use_auth_token=ACCESS_TOKEN
     ).to('cuda')
 
-    binary_images = []
+    base64_images = []
     for _ in range(num_of_images):
         with autocast('cuda'):
             image = ldm(prompt).images[0]
         img_bytes = io.BytesIO()
         image.save(img_bytes, format='png')
-        binary_images.append(img_bytes.getvalue())
-    return binary_images
+        base64_image = jsonable_encoder(img_bytes.getvalue(), custom_encoder={bytes: lambda v: base64.b64encode(v).decode('utf-8')})
+        base64_images.append(base64_image)
+    return base64_images

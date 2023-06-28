@@ -1,4 +1,5 @@
 # stable-diffusion-generator-app
+stable diffusionに触れてみようと思い、簡単なアプリを制作しました。  
 ### 使用言語  
 TypeScript, Python  
 ### フレームワーク  

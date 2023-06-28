@@ -3,7 +3,7 @@ import io
 import os
 
 from fastapi.encoders import jsonable_encoder
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
 from dotenv import load_dotenv
 import torch
 from torch import autocast
@@ -13,17 +13,19 @@ load_dotenv()
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 
 def generate_image(prompt='best quality, background illustration, Uyuni salt lake', num_of_images=1):
-    ldm = StableDiffusionPipeline.from_pretrained(
-        'CompVis/stable-diffusion-v1-4',
+    pipe = StableDiffusionPipeline.from_pretrained(
+        'stabilityai/stable-diffusion-2-1',
         revision='fp16',
         torch_dtype=torch.float16,
         use_auth_token=ACCESS_TOKEN
-    ).to('cuda')
+    )
+    pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
+    pipe = pipe.to("cuda")
 
     base64_images = []
     for _ in range(num_of_images):
         with autocast('cuda'):
-            image = ldm(prompt,
+            image = pipe(prompt,
                         width=512,
                         height=512,
                         num_inference_steps=50,

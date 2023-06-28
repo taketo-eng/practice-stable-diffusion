@@ -20,10 +20,12 @@ async function getData(prompt: string) {
 export const GeneratedImages = forwardRef(async (_, ref) => {
     const [images, setImages] = useState<string[]>([])
     const [isGenerating, setIsGenerating] = useState<boolean>(false)
+    const [fileName, setFileName] = useState<string>("")
 
     useImperativeHandle(ref, () => ({
         async generateImages(prompt: string) {
             setIsGenerating(true)
+            setFileName(prompt)
             setImages(await getData(prompt))
             setIsGenerating(false)
         },
@@ -40,7 +42,7 @@ export const GeneratedImages = forwardRef(async (_, ref) => {
                             <a
                                 className="absolute left-2 top-2 bg-indigo-900 p-2 rounded text-white hover:opacity-80 transition-opacity font-medium"
                                 href={"data:image/png;base64," + base64Data}
-                                download={`output_image_${i}`}
+                                download={`${fileName}_${i}`}
                             >
                                 Download
                             </a>

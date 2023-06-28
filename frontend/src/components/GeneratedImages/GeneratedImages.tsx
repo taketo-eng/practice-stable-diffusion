@@ -24,6 +24,7 @@ export const GeneratedImages = forwardRef(async (_, ref) => {
 
     useImperativeHandle(ref, () => ({
         async generateImages(prompt: string) {
+            setImages([])
             setIsGenerating(true)
             setFileName(prompt)
             setImages(await getData(prompt))

@@ -23,7 +23,11 @@ def generate_image(prompt='best quality, background illustration, Uyuni salt lak
     base64_images = []
     for _ in range(num_of_images):
         with autocast('cuda'):
-            image = ldm(prompt).images[0]
+            image = ldm(prompt,
+                        width=512,
+                        height=512,
+                        num_inference_steps=50,
+                        ).images[0]
         img_bytes = io.BytesIO()
         image.save(img_bytes, format='png')
         base64_image = jsonable_encoder(img_bytes.getvalue(), custom_encoder={bytes: lambda v: base64.b64encode(v).decode('utf-8')})
